@@ -1,0 +1,84 @@
+<div class="card" style="max-width: 700px;" x-data="{ selectedVariant: '', alertType: 'any_drop' }">
+    {% if product_data.image_url %}
+        <img src="{{ product_data.image_url }}" alt="{{ product_data.title }}" class="card__image">
+    {% endif %}
+
+    <div class="card__retailer">{{ retailer.name }}</div>
+    <h2 class="card__title" style="font-size: 1.125rem; margin-bottom: var(--space-sm);">{{ product_data.title }}</h2>
+
+    {% if product_data.brand %}
+        <div class="card__meta">Brand: {{ product_data.brand }}</div>
+    {% endif %}
+
+    <div class="flex gap-md mt-sm mb-md">
+        <div class="stat">
+            <span class="stat__label">Current Price</span>
+            <span class="stat__value">
+                {% if product_data.current_price %}{{ product_data.currency }} {{ product_data.current_price|floatformat:2 }}{% else %}—{% endif %}
+            </span>
+        </div>
+        {% if product_data.original_price and product_data.original_price != product_data.current_price %}
+        <div class="stat">
+            <span class="stat__label">Original Price</span>
+            <span class="stat__value" style="text-decoration: line-through; opacity: 0.5;">
+                {{ product_data.currency }} {{ product_data.original_price|floatformat:2 }}
+            </span>
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card__meta">
+        Availability:
+        {% if product_data.availability == 'in_stock' %}In stock{% elif product_data.availability == 'out_of_stock' %}Out of stock{% else %}Unknown{% endif %}
+    </div>
+
+    {% if product_data.variants %}
+    <div class="form-group mt-md">
+        <label>Select variant</label>
+        <select name="variant_identifier" x-model="selectedVariant" class="input">
+            {% for variant in product_data.variants %}
+                <option value="{{ variant.variant_identifier }}">
+                    {{ variant }}
+                    {% if variant.current_price %} — {{ product_data.currency }} {{ variant.current_price|floatformat:2 }}{% endif %}
+                    {% if variant.availability == 'out_of_stock' %} (Out of stock){% endif %}
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    {% endif %}
+
+    <div class="form-group mt-md">
+        <label>Alert rule</label>
+        <div class="alert-options">
+            <label class="alert-option">
+                <input type="radio" name="alert_type" value="any_drop" x-model="alertType">
+                <span class="alert-option__label">Alert me after any price drop</span>
+            </label>
+            <label class="alert-option">
+                <input type="radio" name="alert_type" value="target_price" x-model="alertType">
+                <span class="alert-option__label">Alert me when it reaches a target price</span>
+            </label>
+            <div x-show="alertType === 'target_price'" style="padding-left: var(--space-lg);">
+                <input type="number" name="target_price" step="0.01" class="input" placeholder="Target price e.g. 80.00">
+            </div>
+            <label class="alert-option">
+                <input type="radio" name="alert_type" value="percentage" x-model="alertType">
+                <span class="alert-option__label">Alert me after a percentage reduction</span>
+            </label>
+            <div x-show="alertType === 'percentage'" style="padding-left: var(--space-lg);">
+                <input type="number" name="percentage_drop" step="0.01" class="input" placeholder="Percentage e.g. 20">
+            </div>
+            <label class="alert-option">
+                <input type="radio" name="alert_type" value="stock_return" x-model="alertType">
+                <span class="alert-option__label">Alert me when my size comes back in stock</span>
+            </label>
+        </div>
+    </div>
+
+    <form method="post" action="{% url 'confirm_tracking' %}" class="mt-md">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--accent" style="width: 100%;">
+            Start tracking this product
+        </button>
+    </form>
+</div>

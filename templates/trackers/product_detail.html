@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load price_tags %}
+
+{% block title %}{{ product.title }} — PriceWatch{% endblock %}
+
+{% block content %}
+<a href="{% url 'watchlist' %}" class="btn btn--ghost mb-md" style="font-size: 0.75rem;">← Back to watchlist</a>
+
+<div class="flex gap-md mb-lg" style="flex-wrap: wrap;">
+    {% if product.image_url %}
+        <img src="{{ product.image_url }}" alt="{{ product.title }}" style="width: 120px; height: 120px; object-fit: contain; background: var(--color-off-white); border-radius: var(--radius);">
+    {% endif %}
+    <div style="flex: 1; min-width: 250px;">
+        <div class="card__retailer">{{ product.retailer.name }}</div>
+        <h1 style="font-size: 1.375rem; margin-bottom: var(--space-xs);">{{ product.title }}</h1>
+        {% if product.brand %}
+            <div class="card__meta">Brand: {{ product.brand }}</div>
+        {% endif %}
+        <a href="{{ product.canonical_url }}" target="_blank" rel="noopener" class="card__meta" style="text-decoration: underline;">View on {{ product.retailer.name }} →</a>
+    </div>
+</div>
+
+{% for vd in variant_data %}
+<div class="card mb-lg">
+    <div class="flex-between mb-md">
+        <h2 style="font-size: 1rem;">{{ vd.variant }}</h2>
+        {% if vd.price_class == 'Excellent price' %}
+            <span class="card__badge badge--excellent">{{ vd.price_class }}</span>
+        {% elif vd.price_class == 'Good price' %}
+            <span class="card__badge badge--good">{{ vd.price_class }}</span>
+        {% elif vd.price_class == 'Typical price' %}
+            <span class="card__badge badge--typical">{{ vd.price_class }}</span>
+        {% elif vd.price_class == 'Above average' %}
+            <span class="card__badge badge--above">{{ vd.price_class }}</span>
+        {% elif vd.price_class == 'Expensive compared with its recorded history' %}
+            <span class="card__badge badge--expensive">Expensive</span>
+        {% endif %}
+    </div>
+
+    <div class="grid grid--4 mb-md">
+        <div class="stat">
+            <span class="stat__label">Current Price</span>
+            <span class="stat__value">{% if vd.stats.current_price %}{{ vd.stats.current_price|floatformat:2 }}{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Starting Price</span>
+            <span class="stat__value">{% if vd.stats.starting_price %}{{ vd.stats.starting_price|floatformat:2 }}{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Lowest Price</span>
+            <span class="stat__value">{% if vd.stats.lowest_price %}{{ vd.stats.lowest_price|floatformat:2 }}{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Highest Price</span>
+            <span class="stat__value">{% if vd.stats.highest_price %}{{ vd.stats.highest_price|floatformat:2 }}{% else %}—{% endif %}</span>
+        </div>
+    </div>
+
+    <div class="grid grid--4 mb-md">
+        <div class="stat">
+            <span class="stat__label">Average Price</span>
+            <span class="stat__value">{% if vd.stats.average_price %}{{ vd.stats.average_price|floatformat:2 }}{% else %}—{% endif %}</span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Total Reduction</span>
+            <span class="stat__value {% if vd.stats.total_reduction and vd.stats.total_reduction > 0 %}stat__value--down{% endif %}">
+                {% if vd.stats.total_reduction %}{{ vd.stats.total_reduction|floatformat:2 }}{% else %}—{% endif %}
+            </span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Change</span>
+            <span class="stat__value {% if vd.stats.percentage_change and vd.stats.percentage_change > 0 %}stat__value--up{% elif vd.stats.percentage_change and vd.stats.percentage_change < 0 %}stat__value--down{% endif %}">
+                {% if vd.stats.percentage_change %}{{ vd.stats.percentage_change|floatformat:1 }}%{% else %}—{% endif %}
+            </span>
+        </div>
+        <div class="stat">
+            <span class="stat__label">Price Changes</span>
+            <span class="stat__value">{{ vd.stats.price_change_count }}</span>
+        </div>
+    </div>
+
+    {% if vd.chart_prices|length > 1 %}
+    <div class="chart-container">
+        <h3 class="mb-sm" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">Price History</h3>
+        <canvas id="chart-{{ forloop.counter }}"></canvas>
+    </div>
+    <script>
+        (function() {
+            var ctx = document.getElementById('chart-{{ forloop.counter }}');
+            if (!ctx) return;
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: {{ vd.chart_labels|to_json|default:'[]' }},
+                    datasets: [{
+                        label: 'Price',
+                        data: {{ vd.chart_prices|to_json|default:'[]' }},
+                        borderColor: '#1A1A1A',
+                        backgroundColor: 'rgba(249, 168, 37, 0.1)',
+                        borderWidth: 1.5,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 2,
+                        pointHoverRadius: 5,
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: {
+                            ticks: { font: { size: 10 } }
+                        },
+                        x: {
+                            ticks: {
+                                font: { size: 9 },
+                                maxRotation: 45,
+                                autoSkip: true,
+                                maxTicksLimit: 8
+                            }
+                        }
+                    }
+                }
+            });
+        })();
+    </script>
+    {% endif %}
+
+    {% if vd.prediction %}
+    <div class="prediction">
+        <div class="flex-between mb-sm">
+            <h3 style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">Price Intelligence</h3>
+            <span class="card__badge badge--typical">{{ vd.prediction.confidence|upper }} confidence</span>
+        </div>
+        <div class="flex gap-md" style="align-items: center;">
+            <div class="prediction__score">{{ vd.prediction.buy_score }}<span style="font-size: 0.875rem; opacity: 0.5;">/100</span></div>
+            <div style="flex: 1;">
+                <div style="font-weight: 600; font-size: 0.9375rem;">{{ vd.prediction.recommended_action }}</div>
+                <div class="prediction__bar">
+                    <div class="prediction__bar-fill" style="width: {{ vd.prediction.buy_score }}%;"></div>
+                </div>
+            </div>
+        </div>
+        <p class="prediction__explanation mt-sm">{{ vd.prediction.explanation }}</p>
+        <p class="prediction__disclaimer">This is an estimate based on recorded price history, not a guarantee.</p>
+    </div>
+    {% else %}
+    <div class="prediction">
+        <h3 style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6; margin-bottom: var(--space-sm);">Price Intelligence</h3>
+        <p class="prediction__explanation">Tracking has started. A prediction will appear after enough price observations have been collected.</p>
+    </div>
+    {% endif %}
+
+    {% if vd.observations %}
+    <div class="mt-md">
+        <h3 class="mb-sm" style="font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">Recent Observations</h3>
+        <table style="width: 100%; font-size: 0.8125rem; border-collapse: collapse;">
+            <thead>
+                <tr style="border-bottom: 1px solid var(--color-light-grey);">
+                    <th style="text-align: left; padding: var(--space-xs) 0; font-weight: 600;">Date</th>
+                    <th style="text-align: right; padding: var(--space-xs) 0; font-weight: 600;">Price</th>
+                    <th style="text-align: right; padding: var(--space-xs) 0; font-weight: 600;">Availability</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for obs in vd.observations %}
+                <tr style="border-bottom: 1px solid var(--color-light-grey);">
+                    <td style="padding: var(--space-xs) 0;">{{ obs.recorded_at|date:"d M Y, H:i" }}</td>
+                    <td style="text-align: right; padding: var(--space-xs) 0; font-family: var(--font-mono);">
+                        {% if obs.price %}{{ obs.price|floatformat:2 }}{% else %}—{% endif %}
+                    </td>
+                    <td style="text-align: right; padding: var(--space-xs) 0;">
+                        {% if obs.availability == 'in_stock' %}In stock{% elif obs.availability == 'out_of_stock' %}Out of stock{% else %}—{% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+</div>
+{% endfor %}
+
+{% if user_rules %}
+<div class="flex gap-sm" style="flex-wrap: wrap;">
+    {% for rule in user_rules %}
+    <form method="post" action="{% url 'delete_tracking' rule.id %}" style="display: inline;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn--danger" style="font-size: 0.75rem;">
+            Stop tracking {{ rule.product_variant }}
+        </button>
+    </form>
+    {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

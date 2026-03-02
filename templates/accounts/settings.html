@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings — PriceWatch{% endblock %}
+
+{% block content %}
+<h1 class="mb-lg">Settings</h1>
+
+<div class="card" style="max-width: 600px;">
+    <div class="stat mb-md">
+        <span class="stat__label">Account tier</span>
+        <span class="stat__value">{{ user.get_tier_display }}</span>
+    </div>
+    <div class="stat mb-md">
+        <span class="stat__label">Product tracking limit</span>
+        <span class="stat__value">{{ user.product_limit }}</span>
+    </div>
+    <div class="stat mb-md">
+        <span class="stat__label">Check interval</span>
+        <span class="stat__value">Every {{ user.check_interval_hours }} hours</span>
+    </div>
+    <div class="stat mb-md">
+        <span class="stat__label">Email alerts</span>
+        <span class="stat__value">{{ user.email_alerts_enabled|yesno:"Enabled,Disabled" }}</span>
+    </div>
+</div>
+{% endblock %}

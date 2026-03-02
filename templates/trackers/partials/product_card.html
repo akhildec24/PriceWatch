@@ -1,0 +1,40 @@
+<div class="card">
+    {% if card.product.image_url %}
+        <img src="{{ card.product.image_url }}" alt="{{ card.product.title }}" class="card__image">
+    {% endif %}
+    <div class="card__retailer">{{ card.product.retailer.name }}</div>
+    <div class="card__title">{{ card.product.title }}</div>
+    {% if card.variant.size or card.variant.colour or card.variant.configuration %}
+        <div class="card__meta">{{ card.variant }}</div>
+    {% endif %}
+    <div class="card__price">
+        {% if card.stats.current_price %}{{ card.stats.current_price|floatformat:2 }}{% else %}—{% endif %}
+    </div>
+    {% if card.stats.starting_price and card.stats.current_price %}
+        <div class="card__meta">
+            When added: {{ card.stats.starting_price|floatformat:2 }}
+        </div>
+    {% endif %}
+    {% if card.stats.lowest_price %}
+        <div class="card__meta">Lowest: {{ card.stats.lowest_price|floatformat:2 }}</div>
+    {% endif %}
+    {% if card.stats.total_reduction and card.stats.total_reduction > 0 %}
+        <div class="card__meta">
+            Down {{ card.stats.total_reduction|floatformat:2 }} since tracking began
+        </div>
+    {% endif %}
+    <div class="mt-sm">
+        {% if card.price_class == 'Excellent price' %}
+            <span class="card__badge badge--excellent">{{ card.price_class }}</span>
+        {% elif card.price_class == 'Good price' %}
+            <span class="card__badge badge--good">{{ card.price_class }}</span>
+        {% elif card.price_class == 'Typical price' %}
+            <span class="card__badge badge--typical">{{ card.price_class }}</span>
+        {% elif card.price_class == 'Above average' %}
+            <span class="card__badge badge--above">{{ card.price_class }}</span>
+        {% elif card.price_class == 'Expensive compared with its recorded history' %}
+            <span class="card__badge badge--expensive">Expensive</span>
+        {% endif %}
+    </div>
+    <a href="{% url 'product_detail' card.product.id %}" class="btn btn--ghost mt-sm" style="width: 100%;">View history</a>
+</div>

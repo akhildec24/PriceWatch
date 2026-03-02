@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard — PriceWatch{% endblock %}
+
+{% block content %}
+<h1 class="mb-lg">Dashboard</h1>
+
+<div class="flex gap-md mb-lg" style="flex-wrap: wrap;">
+    <div class="stat">
+        <span class="stat__label">Tracked Products</span>
+        <span class="stat__value">{{ total_tracked }}</span>
+    </div>
+    <div class="stat">
+        <span class="stat__label">Unread Alerts</span>
+        <span class="stat__value">{{ unread_alerts }}</span>
+    </div>
+</div>
+
+{% if worth_buying %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title section__title--accent">Worth buying now</h2>
+    </div>
+    <p class="mb-md" style="font-size: 0.875rem; opacity: 0.7;">Products currently close to or below their recorded minimum.</p>
+    <div class="grid grid--3">
+        {% for card in worth_buying %}
+            {% include 'trackers/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if recently_reduced %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title section__title--accent">Recently reduced</h2>
+    </div>
+    <p class="mb-md" style="font-size: 0.875rem; opacity: 0.7;">Products that dropped during the past 24 hours.</p>
+    <div class="grid grid--3">
+        {% for card in recently_reduced %}
+            {% include 'trackers/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if back_in_stock %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title section__title--accent">Back in stock</h2>
+    </div>
+    <p class="mb-md" style="font-size: 0.875rem; opacity: 0.7;">Products or variants that have become available again.</p>
+    <div class="grid grid--3">
+        {% for card in back_in_stock %}
+            {% include 'trackers/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if biggest_savings %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title section__title--accent">Biggest savings</h2>
+    </div>
+    <p class="mb-md" style="font-size: 0.875rem; opacity: 0.7;">Products ranked by reduction since tracking began.</p>
+    <div class="grid grid--3">
+        {% for card in biggest_savings %}
+            {% include 'trackers/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if continue_waiting %}
+<section class="section">
+    <div class="section__header">
+        <h2 class="section__title">Continue waiting</h2>
+    </div>
+    <p class="mb-md" style="font-size: 0.875rem; opacity: 0.7;">Products that are still above their typical price.</p>
+    <div class="grid grid--3">
+        {% for card in continue_waiting %}
+            {% include 'trackers/partials/product_card.html' %}
+        {% endfor %}
+    </div>
+</section>
+{% endif %}
+
+{% if not worth_buying and not recently_reduced and not back_in_stock and not biggest_savings and not continue_waiting %}
+<div class="empty-state">
+    <h2 class="empty-state__title">No products tracked yet</h2>
+    <p>Add a product URL to start tracking prices.</p>
+    <a href="{% url 'add_product' %}" class="btn btn--accent mt-md">Add a product</a>
+</div>
+{% endif %}
+{% endblock %}

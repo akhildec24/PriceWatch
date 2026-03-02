@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Product — PriceWatch{% endblock %}
+
+{% block content %}
+<h1 class="mb-lg">Add a product</h1>
+
+<p class="mb-lg" style="max-width: 600px; font-size: 0.875rem; opacity: 0.7;">
+    Paste a product URL from a supported retailer. We'll identify the product,
+    extract the current price, and start tracking it for you.
+</p>
+
+<div class="card mb-lg" style="max-width: 700px;">
+    <form id="add-product-form"
+          hx-post="{% url 'product_preview' %}"
+          hx-target="#preview-container"
+          hx-swap="innerHTML"
+          hx-trigger="submit">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="{{ form.url.id_for_label }}">Product URL</label>
+            {{ form.url }}
+        </div>
+        <button type="submit" class="btn btn--primary" id="preview-btn">
+            Preview product
+        </button>
+    </form>
+</div>
+
+<div id="preview-container"></div>
+
+{% if retailers %}
+<div class="mt-lg" style="max-width: 700px;">
+    <h3 class="mb-sm" style="font-size: 0.875rem; text-transform: uppercase; letter-spacing: 0.05em; opacity: 0.6;">Supported retailers</h3>
+    <div class="flex gap-sm" style="flex-wrap: wrap;">
+        {% for retailer in retailers %}
+            <span class="card__badge badge--typical">{{ retailer.name }}</span>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endblock %}
