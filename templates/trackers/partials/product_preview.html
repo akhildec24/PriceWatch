@@ -1,4 +1,4 @@
-<div class="card" style="max-width: 700px;" x-data="{ selectedVariant: '', alertType: 'any_drop' }">
+<div class="card" style="max-width: 700px; width: 100%;" x-data="{ selectedVariant: '', alertType: 'any_drop' }">
     {% if product_data.image_url %}
         <img src="{{ product_data.image_url }}" alt="{{ product_data.title }}" class="card__image">
     {% endif %}
@@ -58,14 +58,14 @@
                 <input type="radio" name="alert_type" value="target_price" x-model="alertType">
                 <span class="alert-option__label">Alert me when it reaches a target price</span>
             </label>
-            <div x-show="alertType === 'target_price'" style="padding-left: var(--space-lg);">
+            <div x-show="alertType === 'target_price'" style="padding-left: var(--space-md);">
                 <input type="number" name="target_price" step="0.01" class="input" placeholder="Target price e.g. 80.00">
             </div>
             <label class="alert-option">
                 <input type="radio" name="alert_type" value="percentage" x-model="alertType">
                 <span class="alert-option__label">Alert me after a percentage reduction</span>
             </label>
-            <div x-show="alertType === 'percentage'" style="padding-left: var(--space-lg);">
+            <div x-show="alertType === 'percentage'" style="padding-left: var(--space-md);">
                 <input type="number" name="percentage_drop" step="0.01" class="input" placeholder="Percentage e.g. 20">
             </div>
             <label class="alert-option">
