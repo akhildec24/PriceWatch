@@ -39,25 +39,27 @@
 <body>
     <nav class="nav" x-data="{ mobileMenuOpen: false }">
         <div class="nav__inner">
-            <a href="{% url 'dashboard' %}" class="nav__brand">
+            <a href="{% url 'dashboard' %}" class="nav__brand" @click="mobileMenuOpen = false">
                 <span class="nav__logo">PW</span>
                 <span class="nav__name">PriceWatch</span>
             </a>
-            <button class="nav__toggle" @click="mobileMenuOpen = !mobileMenuOpen" aria-label="Toggle menu">
-                <span class="nav__toggle-bar" :class="{ 'nav__toggle-bar--open': mobileMenuOpen }"></span>
-                <span class="nav__toggle-bar" :class="{ 'nav__toggle-bar--open': mobileMenuOpen }"></span>
-                <span class="nav__toggle-bar" :class="{ 'nav__toggle-bar--open': mobileMenuOpen }"></span>
+            <button class="nav__toggle" @click="mobileMenuOpen = !mobileMenuOpen" :class="{ 'nav__toggle--open': mobileMenuOpen }" aria-label="Toggle menu">
+                <span class="nav__toggle-bar"></span>
+                <span class="nav__toggle-bar"></span>
+                <span class="nav__toggle-bar"></span>
             </button>
-            <div class="nav__links" :class="{ 'nav__links--open': mobileMenuOpen }">
+        </div>
+        <div class="nav__links" :class="{ 'nav__links--open': mobileMenuOpen }">
+            <div class="nav__links-inner">
                 {% if user.is_authenticated %}
                     <a href="{% url 'dashboard' %}" class="nav__link" @click="mobileMenuOpen = false">Dashboard</a>
                     <a href="{% url 'watchlist' %}" class="nav__link" @click="mobileMenuOpen = false">Watchlist</a>
-                    <a href="{% url 'add_product' %}" class="nav__link nav__link--accent" @click="mobileMenuOpen = false">Add Product</a>
+                    <a href="{% url 'add_product' %}" class="nav__link" @click="mobileMenuOpen = false">Add Product</a>
                     <a href="{% url 'account_settings' %}" class="nav__link" @click="mobileMenuOpen = false">Settings</a>
                     <a href="{% url 'logout' %}" class="nav__link" @click="mobileMenuOpen = false">Sign out</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="nav__link" @click="mobileMenuOpen = false">Sign in</a>
-                    <a href="{% url 'register' %}" class="nav__link nav__link--accent" @click="mobileMenuOpen = false">Register</a>
+                    <a href="{% url 'register' %}" class="nav__link" @click="mobileMenuOpen = false">Register</a>
                 {% endif %}
             </div>
         </div>
