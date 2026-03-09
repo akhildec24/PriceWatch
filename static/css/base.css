@@ -499,17 +499,10 @@ p {
                     visibility 0s linear 0s,
                     transform 280ms cubic-bezier(0.4, 0, 0.2, 1);
     }
-    .nav__links-inner {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        gap: 0;
-        width: 100%;
-        max-width: 320px;
-    }
     .nav__link {
         display: block;
         width: 100%;
+        max-width: 320px;
         text-align: center;
         padding: 1.125rem 0;
         font-size: 1.0625rem;

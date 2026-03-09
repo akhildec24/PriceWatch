@@ -48,18 +48,16 @@
                 <span class="nav__toggle-bar"></span>
                 <span class="nav__toggle-bar"></span>
             </button>
-        </div>
-        <div class="nav__links" :class="{ 'nav__links--open': mobileMenuOpen }">
-            <div class="nav__links-inner">
+            <div class="nav__links" :class="{ 'nav__links--open': mobileMenuOpen }">
                 {% if user.is_authenticated %}
-                    <a href="{% url 'dashboard' %}" class="nav__link" @click="mobileMenuOpen = false">Dashboard</a>
+                    <a href="{% url 'dashboard' %}" class="nav__link" @click="mobileMenuOpen = false">Home</a>
                     <a href="{% url 'watchlist' %}" class="nav__link" @click="mobileMenuOpen = false">Watchlist</a>
-                    <a href="{% url 'add_product' %}" class="nav__link" @click="mobileMenuOpen = false">Add Product</a>
+                    <a href="{% url 'add_product' %}" class="nav__link nav__link--accent" @click="mobileMenuOpen = false">Add Product</a>
                     <a href="{% url 'account_settings' %}" class="nav__link" @click="mobileMenuOpen = false">Settings</a>
                     <a href="{% url 'logout' %}" class="nav__link" @click="mobileMenuOpen = false">Sign out</a>
                 {% else %}
                     <a href="{% url 'login' %}" class="nav__link" @click="mobileMenuOpen = false">Sign in</a>
-                    <a href="{% url 'register' %}" class="nav__link" @click="mobileMenuOpen = false">Register</a>
+                    <a href="{% url 'register' %}" class="nav__link nav__link--accent" @click="mobileMenuOpen = false">Register</a>
                 {% endif %}
             </div>
         </div>
