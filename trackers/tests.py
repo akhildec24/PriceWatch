@@ -115,6 +115,12 @@ class RetailerAdapterTest(TestCase):
             integration_type=Retailer.INTEGRATION_API,
             adapter_class='trackers.adapters.amazon.AmazonAdapter',
         )
+        self.asos_retailer = Retailer.objects.create(
+            name='ASOS',
+            domain='asos.com',
+            integration_type=Retailer.INTEGRATION_PAGE_EXTRACTION,
+            adapter_class='trackers.adapters.asos.AsosAdapter',
+        )
         self.shopify_retailer = Retailer.objects.create(
             name='Shopify Stores',
             domain='shopify.com',
@@ -134,6 +140,24 @@ class RetailerAdapterTest(TestCase):
         asin = adapter.extract_product_id('https://www.amazon.co.uk/dp/B0TEST1234/ref=xxx')
         self.assertEqual(asin, 'B0TEST1234')
 
+    def test_asos_url_validation(self):
+        from trackers.adapters.asos import AsosAdapter
+        adapter = AsosAdapter(self.asos_retailer)
+        self.assertTrue(adapter.validate_url('https://www.asos.com/dickies/dickies-247-13-inch-work-shorts-in-beige/prd/210082983'))
+        self.assertFalse(adapter.validate_url('https://www.example.com/product/123'))
+
+    def test_asos_product_id_extraction(self):
+        from trackers.adapters.asos import AsosAdapter
+        adapter = AsosAdapter(self.asos_retailer)
+        product_id = adapter.extract_product_id('https://www.asos.com/dickies/dickies-247-13-inch-work-shorts-in-beige/prd/210082983#colourWayId-210082984')
+        self.assertEqual(product_id, '210082983')
+
+    def test_asos_url_normalisation(self):
+        from trackers.adapters.asos import AsosAdapter
+        adapter = AsosAdapter(self.asos_retailer)
+        normalised = adapter.normalise_url('https://www.asos.com/dickies/dickies-247-13-inch-work-shorts-in-beige/prd/210082983#colourWayId-210082984')
+        self.assertEqual(normalised, 'https://www.asos.com/prd/210082983')
+
     def test_shopify_url_validation(self):
         from trackers.adapters.shopify import ShopifyAdapter
         adapter = ShopifyAdapter(self.shopify_retailer)
@@ -149,11 +173,15 @@ class RetailerAdapterTest(TestCase):
 
     def test_find_retailer_for_url(self):
         from trackers.adapters.registry import find_retailer_for_url
-        retailers = [self.amazon_retailer, self.shopify_retailer]
+        retailers = [self.amazon_retailer, self.asos_retailer, self.shopify_retailer]
 
         amazon_url = 'https://www.amazon.co.uk/dp/B0TEST1234'
         found = find_retailer_for_url(amazon_url, retailers)
         self.assertEqual(found, self.amazon_retailer)
+
+        asos_url = 'https://www.asos.com/dickies/dickies-247-13-inch-work-shorts-in-beige/prd/210082983'
+        found = find_retailer_for_url(asos_url, retailers)
+        self.assertEqual(found, self.asos_retailer)
 
         shopify_url = 'https://mystore.com/products/blue-t-shirt'
         found = find_retailer_for_url(shopify_url, retailers)

@@ -2,11 +2,13 @@ from importlib import import_module
 
 from .base import RetailerAdapter
 from .amazon import AmazonAdapter
+from .asos import AsosAdapter
 from .shopify import ShopifyAdapter
 from .woocommerce import WooCommerceAdapter
 
 ADAPTER_REGISTRY = {
     'trackers.adapters.amazon.AmazonAdapter': AmazonAdapter,
+    'trackers.adapters.asos.AsosAdapter': AsosAdapter,
     'trackers.adapters.shopify.ShopifyAdapter': ShopifyAdapter,
     'trackers.adapters.woocommerce.WooCommerceAdapter': WooCommerceAdapter,
 }

@@ -18,6 +18,14 @@ class Command(BaseCommand):
                 'currency': 'GBP',
             },
             {
+                'name': 'ASOS',
+                'domain': 'asos.com',
+                'integration_type': Retailer.INTEGRATION_PAGE_EXTRACTION,
+                'adapter_class': 'trackers.adapters.asos.AsosAdapter',
+                'check_frequency_minutes': 360,
+                'currency': 'GBP',
+            },
+            {
                 'name': 'Shopify Stores',
                 'domain': 'shopify.com',
                 'integration_type': Retailer.INTEGRATION_STRUCTURED_DATA,
