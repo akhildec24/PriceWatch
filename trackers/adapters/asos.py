@@ -1,7 +1,6 @@
 import json
 import re
 
-import requests
 from bs4 import BeautifulSoup
 
 from .base import ProductData, RetailerAdapter, VariantData
@@ -56,20 +55,29 @@ class AsosAdapter(RetailerAdapter):
             )
 
     def _fetch_from_page(self, url: str, product_id: str) -> ProductData:
-        resp = requests.get(
-            url,
-            timeout=15,
-            headers={
-                'User-Agent': (
+        from playwright.sync_api import sync_playwright
+
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=False,
+                args=['--disable-blink-features=AutomationControlled'],
+            )
+            context = browser.new_context(
+                user_agent=(
                     'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) '
                     'AppleWebKit/537.36 (KHTML, like Gecko) '
                     'Chrome/120.0.0.0 Safari/537.36'
                 ),
-                'Accept-Language': 'en-GB,en;q=0.9',
-            },
-        )
-        resp.raise_for_status()
-        soup = BeautifulSoup(resp.content, 'lxml')
+                viewport={'width': 1280, 'height': 800},
+                locale='en-GB',
+            )
+            page = context.new_page()
+            page.goto(url, timeout=45000, wait_until='domcontentloaded')
+            page.wait_for_timeout(5000)
+            html = page.content()
+            browser.close()
+
+        soup = BeautifulSoup(html, 'lxml')
 
         title = ''
         price = None
